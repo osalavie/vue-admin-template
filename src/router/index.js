@@ -179,18 +179,20 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
-    path: 'external-link',
+    path: '/personalSetting',
     component: Layout,
+    hidden: true,
+    meta: { children: ['/personalSetting'] },
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: '/personalSetting',
+        name: 'PersonalSetting',
+        component: () => import('@/views/personalSetting/index'),
+        meta: { title: '个人中心', icon: 'el-icon-document-copy', auth: true }
       }
     ]
   },
-
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

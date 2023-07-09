@@ -11,7 +11,6 @@
       <el-table-column label="中图预览" width="300" align="center">
         <template slot-scope="scope">
           <el-image
-            style="width: 100px; height: 100px"
             :src="getFileFullUrl(scope.row.midImg)"
             fit="fill"
             :preview-src-list="[getFileFullUrl(scope.row.midImg)]"
@@ -21,7 +20,6 @@
       <el-table-column label="大图预览" width="300" align="center">
         <template slot-scope="scope">
           <el-image
-            style="width: 100px; height: 100px"
             :src="getFileFullUrl(scope.row.bigImg)"
             fit="fill"
             :preview-src-list="[getFileFullUrl(scope.row.bigImg)]"
