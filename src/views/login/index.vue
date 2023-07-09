@@ -3,87 +3,82 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">
+          个人空间管理系统
+        </h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="loginId">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
+        <el-input ref="loginId" v-model="loginForm.loginId" placeholder="请输入管理员账号" name="loginId" type="text" tabindex="1" auto-complete="on" />
       </el-form-item>
 
-      <el-form-item prop="password">
+      <el-form-item prop="loginPwd">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
+        <el-input :key="passwordType" ref="password" v-model="loginForm.loginPwd" :type="passwordType" placeholder="请输入密码" name="password" tabindex="2" auto-complete="on" @keyup.enter.native="handleLogin" />
         <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
+      <div class="captchaContainer">
+        <el-form-item prop="captcha">
+          <span class="svg-container">
+            <svg-icon icon-class="nested" />
+          </span>
+          <el-input ref="captcha" v-model="loginForm.captcha" class="captchaInput" placeholder="请输入验证码" name="captcha" type="text" tabindex="3" auto-complete="on" />
+        </el-form-item>
+        <div class="captchaImg" alt="验证码" @click="handleGetCaptcha" v-html="captcha" />
       </div>
-
+      <el-checkbox v-model="loginForm.checked" style="margin-bottom: 20px;">7天免登录</el-checkbox>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-
+import { getCaptcha } from '@/api/captcha'
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
+    // const validateUsername = (rule, value, callback) => {
+    //   if (!validUsername(value)) {
+    //     callback(new Error('Please enter the correct user name'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
+    // const validatePassword = (rule, value, callback) => {
+    //   if (value.length < 6) {
+    //     // callback(new Error('密码不能小于6位'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
-      },
-      loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      captcha: '',
+      loginRules: {
+        loginId: [
+          { required: true, message: '请输入账号', trigger: 'blur' }
+          // { required: true, trigger: 'blur', validator: validateUsername }
+        ],
+        loginPwd: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
+          // { required: true, trigger: 'blur', validator: validatePassword }
+        ],
+        captcha: [
+          { required: true, message: '请输入验证码', trigger: 'blur' }
+        ]
+      }
     }
   },
   watch: {
@@ -93,6 +88,9 @@ export default {
       },
       immediate: true
     }
+  },
+  created() {
+    this.handleGetCaptcha()
   },
   methods: {
     showPwd() {
@@ -105,20 +103,42 @@ export default {
         this.$refs.password.focus()
       })
     },
+    /**
+     * @description 登录
+     */
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
-        if (valid) {
+        if (valid && !this.loading) {
           this.loading = true
+          if (this.loginForm.checked) {
+            this.loginForm.remember = 7
+          }
+
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
-          }).catch(() => {
+          }).catch((error) => {
+            console.log(error)
+            if (typeof error === 'string') {
+              this.$message.error('验证码错误')
+            } else {
+              this.$message.error('用户密码错误')
+            }
+            this.handleGetCaptcha()
             this.loading = false
           })
         } else {
           console.log('error submit!!')
           return false
         }
+      })
+    },
+    /**
+     * @description 获取验证码
+     */
+    handleGetCaptcha() {
+      getCaptcha().then(res => {
+        this.captcha = res
       })
     }
   }
@@ -129,8 +149,8 @@ export default {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
-$light_gray:#fff;
+$bg: #283443;
+$light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -173,9 +193,9 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 
 .login-container {
   min-height: 100%;
@@ -232,6 +252,21 @@ $light_gray:#eee;
     color: $dark_gray;
     cursor: pointer;
     user-select: none;
+  }
+
+  .captchaInput {
+    width: 80%;
+  }
+
+  .captchaContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .captchaImg {
+    display: block;
+    width: 150px;
+    height: 50px;
   }
 }
 </style>

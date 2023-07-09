@@ -36,115 +36,146 @@ export const constantRoutes = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
   {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
   },
-
   {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
-  },
-
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index'),
+        meta: { title: '网站监控', icon: 'dashboard', auth: true }
       }
     ]
   },
-
   {
-    path: '/form',
+    path: '/banners',
     component: Layout,
     children: [
       {
         path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        name: 'Banners',
+        component: () => import('@/views/banners/index'),
+        meta: { title: '首页', icon: 'el-icon-s-home', auth: true }
       }
     ]
   },
-
   {
-    path: '/nested',
+    path: '/articles',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
-    meta: {
-      title: 'Nested',
-      icon: 'nested'
-    },
+    meta: { title: '文章', icon: 'el-icon-notebook-2', auth: true },
+    redirect: '/articles/list',
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
+        path: 'list',
+        name: 'ArticleList',
+        component: () => import('@/views/articles/index'),
+        meta: { title: '文章列表', icon: 'el-icon-s-order', auth: true }
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        name: 'Menu2',
-        meta: { title: 'menu2' }
+        path: 'create',
+        name: 'ArticleCreate',
+        component: () => import('@/views/articles/create'),
+        meta: {
+          title: '创建文章',
+          icon: 'el-icon-document-add',
+          auth: true
+        }
+      },
+      {
+        path: 'edit/:id',
+        name: 'ArticleModify',
+        component: () => import('@/views/articles/edit'),
+        hidden: true,
+        meta: {
+          title: '编辑文章',
+          icon: 'el-icon-document-add',
+          auth: true
+        }
+      },
+      {
+        path: 'category',
+        name: 'category',
+        component: () => import('@/views/articles/category'),
+        meta: { title: '文章分类', icon: 'el-icon-files', auth: true }
+      }
+    ]
+  },
+  {
+    path: '/projects',
+    component: Layout,
+    meta: { title: '项目', icon: 'el-icon-s-cooperation', auth: true },
+    redirect: '/projects/list',
+    children: [
+      {
+        path: 'list',
+        name: 'ProjectList',
+        component: () => import('@/views/projects/index'),
+        meta: { title: '项目列表', icon: 'el-icon-s-order', auth: true }
+      },
+      {
+        path: 'add',
+        name: 'AddProject',
+        component: () => import('@/views/projects/create'),
+        meta: {
+          title: '添加项目',
+          icon: 'el-icon-circle-plus-outline',
+          auth: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/comments',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'comments',
+        component: () => import('@/views/comments/index'),
+        meta: { title: '评论', icon: 'el-icon-s-comment', auth: true }
+      }
+    ]
+  },
+  {
+    path: '/messages',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'messages',
+        component: () => import('@/views/messages/index'),
+        meta: { title: '留言板', icon: 'el-icon-bell', auth: true }
+      }
+    ]
+  },
+  {
+    path: '/about',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'about',
+        component: () => import('@/views/about/index'),
+        meta: { title: '关于', icon: 'el-icon-info' }
+      }
+    ]
+  },
+  {
+    path: '/settings',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'settings',
+        component: () => import('@/views/settings/index'),
+        meta: { title: '设置', icon: 'el-icon-setting', auth: true }
       }
     ]
   },
